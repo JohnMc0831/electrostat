@@ -1,0 +1,14 @@
+.fatHead {
+    margin-top: 20px;
+}
+
+.nearlyFull {
+    max-width: 95% !important;
+    width: 95% !important;
+    margin-left: 20px;
+}
+
+.gradientBackground {
+    background: rgb(255,255,255);
+    background: radial-gradient(circle, rgba(255,255,255,1) 74%, rgba(148,187,233,1) 100%);
+}

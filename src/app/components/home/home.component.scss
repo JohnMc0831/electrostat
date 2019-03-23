@@ -1,17 +1,22 @@
-.container {
+.fatHead {
+  margin-top: 20px;
+}
+
+.nearlyFull {
+  max-width: 95% !important;
+  width: 95% !important;
+  margin-left: 20px;
+}
+
+.gradientBackground {
+  background: lightblue;
+  /*background: radial-gradient(circle, rgba(255,255,255,1) 74%, rgba(148,187,233,1) 100%);*/
+  overflow: hidden; 
+  margin: 0;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 100%;
+}
 
-  background: url(../../../assets/background.jpg) no-repeat center fixed;
-  -webkit-background-size: cover; /* pour anciens Chrome et Safari */
-  background-size: cover; /* version standardisée */
-
-  .title {
-    color: white;
-    margin:0;
-    padding:50px 20px;
-  }
-
+#narrative {
+  min-height: 350px;
 }

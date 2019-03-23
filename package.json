@@ -1,11 +1,11 @@
 {
-  "name": "angular-electron",
-  "version": "5.1.0",
-  "description": "Angular 7 with Electron (Typescript + SASS + Hot Reload)",
-  "homepage": "https://github.com/maximegris/angular-electron",
+  "name": "electroStat",
+  "version": "1.0.0",
+  "description": "Clinical alerting for the UVM Health Network",
+  "homepage": "https://stat.uvmhealth.org",
   "author": {
-    "name": "Maxime GRIS",
-    "email": "maxime.gris@gmail.com"
+    "name": "IT DevOps Team",
+    "email": "israd@uvmhealth.org"
   },
   "keywords": [
     "angular",
@@ -79,5 +79,14 @@
     "wait-on": "3.2.0",
     "webdriver-manager": "12.1.0",
     "zone.js": "0.8.29"
+  },
+  "dependencies": {
+    "@aspnet/signalr": "^1.1.2",
+    "@types/jquery": "^3.3.29",
+    "@types/moment": "^2.13.0",
+    "@types/signalr": "^2.2.35",
+    "jquery": "^3.3.1",
+    "moment": "^2.24.0",
+    "typescript-logging": "^0.6.3"
   }
 }

@@ -1,26 +1,50 @@
 import { app, BrowserWindow, screen } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
-
+import * as signalR from '@aspnet/signalr';
+import { INTERNAL_BROWSER_DYNAMIC_PLATFORM_PROVIDERS } from '@angular/platform-browser-dynamic/src/platform_providers';
+import {catService, catProd } from './src/app/models/logging';
 let win, serve;
 const args = process.argv.slice(1);
 serve = args.some(val => val === '--serve');
+
+
+function loadUp() {
+  initSignalR();
+  createWindow();
+}
+
+function initSignalR() {
+  catProd.info('Initializing signalR client');
+  const connection = new signalR.HubConnectionBuilder()
+    .withUrl('https://stat.uvmhealth.org/alertHub')
+    .configureLogging(signalR.LogLevel.Information)
+    .build();
+
+connection.start().then(function () {
+    catProd.info('signalR sub-system is now connected...');
+});
+}
 
 function createWindow() {
 
   const electronScreen = screen;
   const size = electronScreen.getPrimaryDisplay().workAreaSize;
-
+  // tslint:disable-next-line:quotemark
+  catProd.info("creating main window...");
   // Create the browser window.
   win = new BrowserWindow({
-    x: 0,
-    y: 0,
-    width: size.width,
-    height: size.height,
+    x: (size.width / 2) - 400,
+    y: (size.height / 2) - 300,
+    width: 800,
+    height: 600,
     webPreferences: {
       nodeIntegration: true,
     },
+    icon: __dirname + '/dist/favicon.png'
   });
+
+  catProd.info(`icon file: ${win.icon}`);
 
   if (serve) {
     require('electron-reload')(__dirname, {
@@ -54,7 +78,7 @@ try {
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
-  app.on('ready', createWindow);
+  app.on('ready', loadUp);
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {
