@@ -87,6 +87,6 @@
     "@types/signalr": "^2.2.35",
     "jquery": "^3.3.1",
     "moment": "^2.24.0",
-    "typescript-logging": "^0.6.3"
+    "winston": "^3.2.1"
   }
 }
