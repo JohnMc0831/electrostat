@@ -7,8 +7,7 @@ import * as winston from 'winston';
 let win: BrowserWindow;
 let contents: webContents;
 let serve;
-const tempDir = app.getPath('temp');
-const logPath = path.join(tempDir, './electoStat.log');
+const logPath = './electoStat.log';
 const args = process.argv.slice(1);
 serve = args.some(val => val === '--serve');
 const logger = winston.createLogger({
@@ -41,7 +40,7 @@ function createWindow() {
       nodeIntegration: true,
     },
     icon: __dirname + '/dist/favicon.png',
-    show: false
+    show: true
   });
   // use this object for ipc messaging
   contents = win.webContents;
@@ -59,15 +58,15 @@ function createWindow() {
     }));
   }
   // JRM edits here
-  win.setResizable(false); // no window resizing for you!
-  logger.info('Sending showLastALert to ipcRenderer');
-  contents.send('showLastAlert');
+  // win.setResizable(false); // no window resizing for you!
+  // logger.info('Sending showLastALert to ipcRenderer');
+  // contents.send('showLastAlert');
   // tray icon and context menu
   let tray = null;
   const iconPath = path.join(__dirname, './dist/favicon.png');
   let trayIcon = nativeImage.createFromPath(iconPath);
   trayIcon = trayIcon.resize({width: 16, height: 16});
-  logger.info(`trayIcon path: ${iconPath}`);
+  // logger.info(`trayIcon path: ${iconPath}`);
   tray = new Tray(trayIcon);
 
   const menuTemplate: Electron.MenuItemConstructorOptions[] = [
@@ -138,7 +137,8 @@ function showPastAlerts() {
 
 function seeLastAlert() {
   // TODO: pass this from ipcMain to ipcRenderer
-  logger.info('See Last Alert menuItem was clicked!');
+  logger.info('See Last Alert menuItem was clicked! Sending message to ipcRenderer!');
+  win.webContents.send('mainChannel', 'showLastAlert');
 }
 
 function togglePlaySound() {
@@ -149,8 +149,9 @@ function toggleShowAll() {
   logger.info('toggleShowAll() was clicked!');
 }
 
-ipcMain.on('alertReceived', (event, arg) => {
-  logger.info('alertReceived call from ipcMain!');
+ipcMain.on('mainChannel', (event, arg) => {
+  logger.info(`ipcRenderer ImUp event received: ${arg}!`);
+  event.returnValue = 'Cool beans!';
 });
 
 try {
@@ -177,7 +178,7 @@ try {
     }
   });
 
-} catch (e) {
+  } catch (e) {
   // Catch Error
   // throw e;
 }

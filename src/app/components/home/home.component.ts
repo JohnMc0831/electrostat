@@ -6,6 +6,7 @@ import { StatAlert } from '../../models/models';
 import * as winston from 'winston';
 import * as signalR from '@aspnet/signalr';
 import * as path from 'path';
+import {ElectronService} from 'ngx-electron';
 
 @Component({
   selector: 'app-home',
@@ -14,9 +15,9 @@ import * as path from 'path';
 })
 export class HomeComponent implements OnInit {
   public logger: winston.Logger;
-  constructor() {
-    const tempDir = app.getPath('temp');
-    const logPath = path.join(tempDir, 'statClient.log');
+  constructor(private electronSvc: ElectronService) {
+    // const tempDir = app.getPath('temp');
+    const logPath = './electoStat.log';
     this.logger = winston.createLogger({
       level: 'info',
       format: winston.format.simple(),
@@ -37,10 +38,17 @@ export class HomeComponent implements OnInit {
   renderer: any = ipcRenderer;
 
   ngOnInit() {
+    if (this.electronSvc.isElectronApp) {
+      this.logger.info('Awakening ipcRenderer...');
+      const imUp: string = this.electronSvc.ipcRenderer.sendSync('mainChannel', 'readyForAlerts');
+      this.logger.info(`ipcRenderer is awake!`);
+    }
     this.initSignalR();
-
-    this.renderer.on('showLastAlert', function(event, data) {
-      this.logger.info('ipc message to show last alert received by renderer');
+    ipcRenderer.on('mainChannel', (event, msg) => {
+      // TODO: show the alert
+      if (msg === 'showLastAlert') {
+        this.logger.info('showLastAlert received from ipcMain!');
+      }
     });
   }
 
