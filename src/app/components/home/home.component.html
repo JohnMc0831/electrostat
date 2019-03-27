@@ -2,16 +2,16 @@
       <div class="container">
         <div class="row text-center">
           <div class="col-lg-12 text-center">
-            <h1 id="title" class="text-danger">{{ alert.title }}</h1>
+            <h1 id="title">{{ alert.title }}</h1>
           </div>
         </div>
         <hr />
         <div class="row">
           <div class="col">
-            <span class="text-success">Alert Type: <span id="alertType"></span></span>
+            <span id="at">Alert Type: <span id="alertType"></span></span>
           </div>
           <div class="col text-right">
-            <span class="text-success">Sent: <span id="alertSent">{{ alert.alertTime }}</span></span>
+            <span id="as">Sent: <span id="alertSent">{{ alert.alertTime }}</span></span>
           </div>
         </div>
         <div class="row">
@@ -22,13 +22,10 @@
         <div class="container champlainBlue">
           <div class="row">
             <div class="col fatHead">
-              <input type="checkbox" id="chkPlayAlertSound" />&nbsp;&nbsp;<label class="text-success"
-                style="margin-bottom: 0px;">Play Alert Sound?</label><br />
-              <input type="checkbox" id="chkShowAllAlerts" />&nbsp;&nbsp;<label class="text-success"
-                style="margin-bottom: 0px;">Show all alerts?</label>
+              <span class='tagline'>Clinical Alerts for the UVM Health Network</span>
             </div>
             <div class="col text-center fatHead">
-              <a href='#' class="btn btn-outline-success">Acknowledge</a>
+              <a href='#' (click)='ackAlert()' class="btn btn-outline-success">Acknowledge</a>
             </div>
             <div class="col text-right fatHead">
               <img src='./assets/UVMHealthNetwork.png' height="50" title="The University of Vermont Health Network">

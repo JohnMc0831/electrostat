@@ -2,15 +2,12 @@ export class StatAlert {
   constructor() {}
   title: string;
   sent: Date;
+  sentBy: string;
   narrative: string;
-  code: string;
-  locations: any[];
-  users: any[];
-  priority: string;
-  Id: string;
-  alertLevel: number;
+  Id: number;
+  alertLevel: string;
+  alertType: string;
   alertTime: string;
-  shortnarrative: string;
 }
 
 export class Location {

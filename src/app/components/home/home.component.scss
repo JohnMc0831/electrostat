@@ -62,9 +62,19 @@ $colors: (
   color: map-get($colors, testForeground);
 }
 
+.testAlertText {
+  background: white;
+  color: map-get($colors, primary);
+}
+
 .normalAlert {
   background: map-get($colors, normalBackground);
   color: map-get($colors, normalForeground);
+}
+
+.normalAlertText {
+  background: white;
+  color: map-get($colors, primary);
 }
 
 .highAlert {
@@ -72,11 +82,26 @@ $colors: (
   color: map-get($colors, highForeground);
 }
 
+.highAlertText {
+  background: white;
+  color: map-get($colors, primary);
+}
+
 .emergentAlert {
   background: map-get($colors, emergentBackground);
   color: map-get($colors, emergentForeground);
 }
 
+.emergentAlertText {
+  background: white;
+  color: map-get($colors, primary);
+}
+
 #narrative {
   min-height: 350px;
+}
+
+.tagline {
+  font-size: xx-small;
+  color: map-get($colors, primary);
 }

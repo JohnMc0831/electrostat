@@ -7,7 +7,11 @@ import * as winston from 'winston';
 let win: BrowserWindow;
 let contents: webContents;
 let serve;
-const logPath = './electoStat.log';
+let tray = null;
+let contextMenu;
+const tempPath = app.getPath('temp');
+const logPath = path.join(tempPath, 'electoStat.log');
+console.log('logPath: ' + logPath);
 const args = process.argv.slice(1);
 serve = args.some(val => val === '--serve');
 const logger = winston.createLogger({
@@ -35,13 +39,15 @@ function createWindow() {
     x: (size.width / 2) - 400,
     y: (size.height / 2) - 300,
     width: 800,
-    height: 600,
+    height: 572,
     webPreferences: {
       nodeIntegration: true,
     },
     icon: __dirname + '/dist/favicon.png',
-    show: true
+    show: false
   });
+
+  win.setMenuBarVisibility(false);
   // use this object for ipc messaging
   contents = win.webContents;
 
@@ -58,11 +64,8 @@ function createWindow() {
     }));
   }
   // JRM edits here
-  // win.setResizable(false); // no window resizing for you!
-  // logger.info('Sending showLastALert to ipcRenderer');
-  // contents.send('showLastAlert');
+   win.setResizable(false); // no window resizing for you!
   // tray icon and context menu
-  let tray = null;
   const iconPath = path.join(__dirname, './dist/favicon.png');
   let trayIcon = nativeImage.createFromPath(iconPath);
   trayIcon = trayIcon.resize({width: 16, height: 16});
@@ -71,6 +74,7 @@ function createWindow() {
 
   const menuTemplate: Electron.MenuItemConstructorOptions[] = [
     {
+      id: 'seeLastAlert',
       label: 'See Last Alert',
       type: 'normal',
       click(item) {
@@ -78,6 +82,7 @@ function createWindow() {
       }
     },
     {
+      id: 'showPastAlerts',
       label: 'Show Past Alerts',
       type: 'normal',
       click(item) {
@@ -85,6 +90,7 @@ function createWindow() {
       }
     },
     {
+      id: 'viewLog',
       label: 'View Log File',
       type: 'normal',
       click(item) {
@@ -93,14 +99,13 @@ function createWindow() {
     },
     { type: 'separator'},
     {
+      id: 'playSound',
       label: 'Play Sound?',
       type: 'checkbox',
-      checked: true,
-      click(item) {
-        togglePlaySound();
-      }
+      checked: true
     },
     {
+      id: 'showAllAlerts',
       label: 'Show ALL alerts?',
       type: 'checkbox',
       checked: false,
@@ -110,11 +115,12 @@ function createWindow() {
     },
     { type: 'separator' },
     {
+      id: 'exit',
       label: 'Exit',
       role: 'quit'
     },
   ];
-  const contextMenu = Menu.buildFromTemplate(menuTemplate);
+  contextMenu = Menu.buildFromTemplate(menuTemplate);
   tray.setToolTip('Stat!');
   tray.setContextMenu(contextMenu);
   // Emitted when the window is closed.
@@ -128,6 +134,7 @@ function createWindow() {
 
 function viewLogFile() {
   logger.info('viewLogFile was clicked!');
+  shell.openItem(path.join(logPath));
 }
 
 function showPastAlerts() {
@@ -138,7 +145,12 @@ function showPastAlerts() {
 function seeLastAlert() {
   // TODO: pass this from ipcMain to ipcRenderer
   logger.info('See Last Alert menuItem was clicked! Sending message to ipcRenderer!');
-  win.webContents.send('mainChannel', 'showLastAlert');
+  // is playsound is checked, then pass showLastAlertSound
+  if (contextMenu.getMenuItemById('playSound').checked) {
+    win.webContents.send('mainChannel', 'showLastAlertSound');
+  } else {
+    win.webContents.send('mainChannel', 'showLastAlert');
+  }
 }
 
 function togglePlaySound() {
@@ -150,7 +162,21 @@ function toggleShowAll() {
 }
 
 ipcMain.on('mainChannel', (event, arg) => {
-  logger.info(`ipcRenderer ImUp event received: ${arg}!`);
+  switch (arg) {
+    case 'showWindow':
+      win.show();
+      break;
+    case 'readyForAlerts':
+      logger.info('ipcRenderer is ready to receive alerts.');
+      break;
+    case 'playSound':
+      logger.info('ipcRenderer asked for playSound state!');
+      const menu = tray.contextMenu;
+      event.returnValue = menu.getMenuItemById('Play Sound?').checked;
+      break;
+    default:
+      break;
+  }
   event.returnValue = 'Cool beans!';
 });
 
