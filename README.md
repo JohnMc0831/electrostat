@@ -1,2 +1,2 @@
-#electroStat
-Clincal alerting for the UVM Health Network
+# electroStat
+Clinical alerting for the UVM Health Network
