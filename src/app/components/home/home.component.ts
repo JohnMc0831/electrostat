@@ -138,11 +138,12 @@ export class HomeComponent implements OnInit {
         }
      }
 
+     // Groups scope
      if (this.alert.affectedGroups) {
         const grps = this.alert.affectedGroups.split(',');
         grps.forEach (function(value) {
-        that.logger.info(`User is a member of targeted in-scope group <strong>${value}</strong>.  The alert WILL be shown!`);
-        return true;
+          that.logger.info(`User is a member of targeted in-scope group <strong>${value}</strong>.  The alert WILL be shown!`);
+          return true;
         });
      }
 
