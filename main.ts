@@ -7,8 +7,8 @@ import * as winston from 'winston';
 let win: BrowserWindow;
 let contents: webContents;
 let serve;
-let tray = null;
-let contextMenu;
+let tray: Tray = null;
+let contextmenu: Menu;
 const tempPath = app.getPath('temp');
 const logPath = path.join(tempPath, 'electoStat.log');
 console.log('logPath: ' + logPath);
@@ -18,13 +18,25 @@ const logger = winston.createLogger({
   level: 'info',
   format: winston.format.simple(),
   transports: [
-    new winston.transports.File({ filename: logPath }),
+    new winston.transports.File({
+      filename: logPath,
+      format:
+        winston.format.combine(
+          winston.format.colorize(),
+          winston.format.timestamp({
+            format: 'MM-DD-YYYY HH:mm:ss'
+          }),
+          winston.format.printf(info => `${info.timestamp}: ${info.message}`)
+      )
+    }),
     new winston.transports.Console({
       format:
         winston.format.combine(
           winston.format.colorize(),
-          winston.format.timestamp(),
-          winston.format.printf(info => `${info.timestamp}: ${info.level} - ${info.message}`)
+          winston.format.timestamp({
+            format: 'MM-DD-YYYY HH:mm:ss'
+          }),
+          winston.format.printf(info => `${info.timestamp}: ${info.message}`)
         ),
     })
   ]
@@ -71,7 +83,6 @@ function createWindow() {
   trayIcon = trayIcon.resize({width: 16, height: 16});
   // logger.info(`trayIcon path: ${iconPath}`);
   tray = new Tray(trayIcon);
-
   const menuTemplate: Electron.MenuItemConstructorOptions[] = [
     {
       id: 'seeLastAlert',
@@ -120,9 +131,9 @@ function createWindow() {
       role: 'quit'
     },
   ];
-  contextMenu = Menu.buildFromTemplate(menuTemplate);
+  contextmenu = Menu.buildFromTemplate(menuTemplate);
   tray.setToolTip('Stat!');
-  tray.setContextMenu(contextMenu);
+  tray.setContextMenu(contextmenu);
   // Emitted when the window is closed.
   win.on('closed', () => {
     // Dereference the window object, usually you would store window
@@ -146,7 +157,7 @@ function seeLastAlert() {
   // TODO: pass this from ipcMain to ipcRenderer
   logger.info('See Last Alert menuItem was clicked! Sending message to ipcRenderer!');
   // is playsound is checked, then pass showLastAlertSound
-  if (contextMenu.getMenuItemById('playSound').checked) {
+  if (contextmenu.getMenuItemById('playSound').checked) {
     win.webContents.send('mainChannel', 'showLastAlertSound');
   } else {
     win.webContents.send('mainChannel', 'showLastAlert');
@@ -161,6 +172,7 @@ function toggleShowAll() {
   logger.info('toggleShowAll() was clicked!');
 }
 
+// ipcMain listener mainChannel
 ipcMain.on('mainChannel', (event, arg) => {
   switch (arg) {
     case 'showWindow':
@@ -168,16 +180,19 @@ ipcMain.on('mainChannel', (event, arg) => {
       break;
     case 'readyForAlerts':
       logger.info('ipcRenderer is ready to receive alerts.');
+      event.returnValue = 'Okey Dokey';
       break;
     case 'playSound':
       logger.info('ipcRenderer asked for playSound state!');
-      const menu = tray.contextMenu;
-      event.returnValue = menu.getMenuItemById('Play Sound?').checked;
+      event.returnValue = contextmenu.getMenuItemById('playSound').checked;
+      break;
+    case 'showAll':
+      logger.info('ipcRenderer asked for showAllAlerts state!');
+      event.returnValue = contextmenu.getMenuItemById('showAllAlerts').checked;
       break;
     default:
       break;
   }
-  event.returnValue = 'Cool beans!';
 });
 
 try {

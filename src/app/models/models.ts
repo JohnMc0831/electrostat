@@ -8,6 +8,11 @@ export class StatAlert {
   alertLevel: string;
   alertType: string;
   alertTime: string;
+  sendAll: boolean;
+  affectedVlans: string;
+  affectedGroups: string;
+  targets: string;
+  showAll: boolean;
 }
 
 export class Location {

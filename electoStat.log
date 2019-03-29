@@ -26,3 +26,211 @@ info: Stat alert received at 03/27/2019 02:35:00 pm.
 info: Alert Title: Census Update
 info: Received alert!
 info: Alert level is High
+info: Awakening ipcRenderer...
+info: ipcRenderer is awake!
+info: Initializing signalR client
+info: signalR sub-system is now connected...
+info: showLastAlert received from ipcMain!
+info: Getting most recent alert from REST API.
+info: Retrieved alert [object Object].
+info: Stat alert received at 03/28/2019 12:32:31 pm.
+info: Alert Title: Census Update was sent at 2019-03-26T07:28:20.017
+info: Stat alert received at 03/28/2019 12:32:31 pm.
+info: Alert Title: Census Update
+info: Received alert!
+info: Alert level is High
+info: Awakening ipcRenderer...
+info: ipcRenderer is awake!
+info: Initializing signalR client
+info: signalR sub-system is now connected...
+info: showLastAlert received from ipcMain!
+info: Getting most recent alert from REST API.
+info: Retrieved alert [object Object].
+info: Stat alert received at 03/29/2019 11:12:42 am.
+info: Alert Title: Surge Level Three was sent at 2019-03-29T08:59:10.89
+info: Stat alert received at 03/29/2019 11:12:42 am.
+info: Alert Title: Surge Level Three
+info: Received alert!
+info: Alert level is High
+info: Awakening ipcRenderer...
+info: ipcRenderer is awake!
+info: Initializing signalR client
+info: signalR sub-system is now connected...
+info: showLastAlert received from ipcMain!
+info: Getting most recent alert from REST API.
+info: Retrieved alert [object Object].
+info: Stat alert received at 03/29/2019 01:34:54 pm.
+info: Alert Title: Honor Walk was sent at 2019-03-29T12:01:58.41
+info: Stat alert received at 03/29/2019 01:34:54 pm.
+info: Alert Title: Honor Walk
+info: Received alert!
+info: Alert level is High
+info: Awakening ipcRenderer...
+info: ipcRenderer is awake!
+info: Initializing signalR client
+info: signalR sub-system is now connected...
+info: showLastAlert received from ipcMain!
+info: Getting most recent alert from REST API.
+info: Retrieved alert [object Object].
+info: Stat alert received at 03/29/2019 01:36:58 pm.
+info: Alert Title: Honor Walk was sent at 2019-03-29T12:01:58.41
+info: Awakening ipcRenderer...
+info: ipcRenderer is awake!
+info: Initializing signalR client
+info: signalR sub-system is now connected...
+info: showLastAlert received from ipcMain!
+info: Getting most recent alert from REST API.
+info: Retrieved alert [object Object].
+info: Stat alert received at 03/29/2019 01:38:58 pm.
+info: Alert Title: Honor Walk was sent at 2019-03-29T12:01:58.41
+info: Current IP Address: 172.17.96.1
+info: Awakening ipcRenderer...
+info: ipcRenderer is awake!
+info: Initializing signalR client
+info: signalR sub-system is now connected...
+info: showLastAlert received from ipcMain!
+info: Getting most recent alert from REST API.
+info: Retrieved alert [object Object].
+info: Stat alert received at 03/29/2019 01:43:00 pm.
+info: Alert Title: Honor Walk was sent at 2019-03-29T12:01:58.41
+info: Current IP Address: 10.32.73.97
+info: Stat alert received at 03/29/2019 01:43:00 pm.
+info: Alert Title: Honor Walk
+info: Received alert!
+info: Alert level is High
+info: Awakening ipcRenderer...
+info: ipcRenderer is awake!
+info: Initializing signalR client
+info: signalR sub-system is now connected...
+info: showLastAlert received from ipcMain!
+info: Getting most recent alert from REST API.
+info: Retrieved alert [object Object].
+info: Stat alert received at 03/29/2019 01:54:33 pm.
+info: Alert Title: Honor Walk was sent at 2019-03-29T12:01:58.41
+info: Current IP Address: 10.32.73.97
+info: This alert is intended to displayed only in certain locations.
+info: Evalutaing whether this location is in scope...
+info: Awakening ipcRenderer...
+info: ipcRenderer is awake!
+info: Initializing signalR client
+info: signalR sub-system is now connected...
+info: showLastAlert received from ipcMain!
+info: Getting most recent alert from REST API.
+info: Retrieved alert [object Object].
+info: Stat alert received at 03/29/2019 01:57:31 pm.
+info: Alert Title: Honor Walk was sent at 2019-03-29T12:01:58.41
+info: Current IP Address: 10.32.73.97
+info: This alert is intended to displayed only in certain locations.
+info: Evalutaing whether this location is in scope...
+info: Awakening ipcRenderer...
+info: ipcRenderer is awake!
+info: Initializing signalR client
+info: signalR sub-system is now connected...
+info: showLastAlert received from ipcMain!
+info: Getting most recent alert from REST API.
+info: Retrieved alert [object Object].
+info: Stat alert received at 03/29/2019 02:00:39 pm.
+info: Alert Title: Honor Walk was sent at 2019-03-29T12:01:58.41
+info: Current IP Address: 10.32.73.97
+info: This alert is intended to displayed only in certain locations.
+info: Evalutaing whether this location is in scope...
+info: Awakening ipcRenderer...
+info: ipcRenderer is awake!
+info: Initializing signalR client
+info: signalR sub-system is now connected...
+info: showLastAlert received from ipcMain!
+info: Getting most recent alert from REST API.
+info: Retrieved alert [object Object].
+info: Stat alert received at 03/29/2019 02:03:50 pm.
+info: Alert Title: Honor Walk was sent at 2019-03-29T12:01:58.41
+info: Current IP Address: 10.32.73.97
+info: This alert is intended to displayed only in certain locations.
+info: Evalutaing whether this location is in scope...
+info: Awakening ipcRenderer...
+info: ipcRenderer is awake!
+info: Initializing signalR client
+info: signalR sub-system is now connected...
+info: showLastAlert received from ipcMain!
+info: Getting most recent alert from REST API.
+info: Retrieved alert [object Object].
+info: Stat alert received at 03/29/2019 02:06:52 pm.
+info: Alert Title: Honor Walk was sent at 2019-03-29T12:01:58.41
+info: Current IP Address: 10.32.73.97
+info: This alert is intended to displayed only in certain locations.
+info: Evalutaing whether this location is in scope...
+info: Awakening ipcRenderer...
+info: ipcRenderer is awake!
+info: Initializing signalR client
+info: signalR sub-system is now connected...
+info: showLastAlert received from ipcMain!
+info: Getting most recent alert from REST API.
+info: Retrieved alert [object Object].
+info: Stat alert received at 03/29/2019 02:07:53 pm.
+info: Alert Title: Honor Walk was sent at 2019-03-29T12:01:58.41
+info: Current IP Address: 10.32.73.97
+info: This alert is intended to displayed only in certain locations.
+info: Evalutaing whether this location is in scope...
+info: Awakening ipcRenderer...
+info: ipcRenderer is awake!
+info: Initializing signalR client
+info: signalR sub-system is now connected...
+info: showLastAlert received from ipcMain!
+info: Getting most recent alert from REST API.
+info: Retrieved alert [object Object].
+info: Stat alert received at 03/29/2019 02:08:45 pm.
+info: Alert Title: Honor Walk was sent at 2019-03-29T12:01:58.41
+info: Current IP Address: 10.32.73.97
+info: This alert is intended to displayed only in certain locations.
+info: Evalutaing whether this location is in scope...
+info: Awakening ipcRenderer...
+info: ipcRenderer is awake!
+info: Initializing signalR client
+info: signalR sub-system is now connected...
+info: showLastAlert received from ipcMain!
+info: Getting most recent alert from REST API.
+info: Retrieved alert [object Object].
+info: Stat alert received at 03/29/2019 02:12:54 pm.
+info: Alert Title: Honor Walk was sent at 2019-03-29T12:01:58.41
+info: Current IP Address: 10.32.73.97
+info: This alert is intended to displayed only in certain locations.
+info: Evalutaing whether this location is in scope...
+info: Device subnet is 10.32.730.
+info: Stat alert received at 03/29/2019 02:12:54 pm.
+info: Alert Title: Honor Walk
+info: Received alert!
+info: Alert level is High
+info: Awakening ipcRenderer...
+info: ipcRenderer is awake!
+info: Initializing signalR client
+info: signalR sub-system is now connected...
+info: showLastAlert received from ipcMain!
+info: Getting most recent alert from REST API.
+info: Retrieved alert [object Object].
+info: Stat alert received at 03/29/2019 02:13:31 pm.
+info: Alert Title: Honor Walk was sent at 2019-03-29T12:01:58.41
+info: Current IP Address: 10.32.73.97
+info: This alert is intended to displayed only in certain locations.
+info: Evalutaing whether this location is in scope...
+info: Device subnet is 10.32.730.
+info: Stat alert received at 03/29/2019 02:13:31 pm.
+info: Alert Title: Honor Walk
+info: Received alert!
+info: Alert level is High
+info: Awakening ipcRenderer...
+info: ipcRenderer is awake!
+info: Initializing signalR client
+info: signalR sub-system is now connected...
+info: showLastAlert received from ipcMain!
+info: Getting most recent alert from REST API.
+info: Retrieved alert [object Object].
+info: Stat alert received at 03/29/2019 02:15:14 pm.
+info: Alert Title: Honor Walk was sent at 2019-03-29T12:01:58.41
+info: Current IP Address: 10.32.73.97
+info: This alert is intended to displayed only in certain locations.
+info: Evalutaing whether this location is in scope...
+info: Device subnet is 10.32.73.0.
+info: Matched VLAN/Subnet: 10.32.73.0.  The alert WILL be displayed.
+info: Stat alert received at 03/29/2019 02:15:14 pm.
+info: Alert Title: Honor Walk
+info: Received alert!
+info: Alert level is High
