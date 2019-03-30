@@ -55,6 +55,7 @@
     "@types/jasmine": "2.8.7",
     "@types/jasminewd2": "2.0.3",
     "@types/node": "8.9.4",
+    "activedirectory": "^0.7.2",
     "chai": "^4.2.0",
     "codelyzer": "4.5.0",
     "conventional-changelog-cli": "2.0.11",
