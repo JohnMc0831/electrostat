@@ -70,14 +70,13 @@ function createMainWindow() {
     }));
   }
   // JRM edits here
-  win.setMenuBarVisibility(false);
+  win.setMenuBarVisibility(true);
   win.setResizable(false); // no window resizing for you!
 
   // tray icon and context menu
   const iconPath = path.join(__dirname, './dist/favicon.png');
   let trayIcon = nativeImage.createFromPath(iconPath);
   trayIcon = trayIcon.resize({width: 16, height: 16});
-  // logger.info(`trayIcon path: ${iconPath}`);
   tray = new Tray(trayIcon);
   const menuTemplate: Electron.MenuItemConstructorOptions[] = [
     {
