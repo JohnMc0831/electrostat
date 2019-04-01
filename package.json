@@ -86,7 +86,6 @@
   },
   "dependencies": {
     "@aspnet/signalr": "^1.1.2",
-    "@electron-helpers/window-manager": "^1.1.0",
     "@types/howler": "^2.1.0",
     "@types/jquery": "^3.3.29",
     "@types/moment": "^2.13.0",
@@ -95,6 +94,7 @@
     "electron-modal": "^1.0.0",
     "electron-packager": "^13.1.1",
     "electron-typescript-definitions": "^8.2.2",
+    "electron-window-manager": "^1.0.6",
     "howler": "^2.1.1",
     "ip": "^1.1.5",
     "jquery": "^3.3.1",

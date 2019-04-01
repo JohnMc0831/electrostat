@@ -3,18 +3,13 @@ import * as path from 'path';
 import * as url from 'url';
 import { INTERNAL_BROWSER_DYNAMIC_PLATFORM_PROVIDERS } from '@angular/platform-browser-dynamic/src/platform_providers';
 import * as winston from 'winston';
-const { prefsWindow } = require('@electron-helpers/window-manager');
-const settingsWindow = prefsWindow('preferences', path.join(__dirname, './dist/preferences.html'),
-                                     { width: 400, height: 300 }, { x: 'center', y: 150 });
 
 let win: BrowserWindow;
-let contents: webContents;
 let serve;
 let tray: Tray = null;
 let contextmenu: Menu;
 const tempPath = app.getPath('temp');
 const logPath = path.join(tempPath, 'electoStat.log');
-console.log('logPath: ' + logPath);
 const args = process.argv.slice(1);
 serve = args.some(val => val === '--serve');
 const logger = winston.createLogger({
@@ -45,8 +40,7 @@ const logger = winston.createLogger({
   ]
 });
 
-
-function createWindow() {
+function createMainWindow() {
   const electronScreen = screen;
   const size = electronScreen.getPrimaryDisplay().workAreaSize;
   logger.info('Creating electroStat Main Window...');
@@ -60,12 +54,8 @@ function createWindow() {
       nodeIntegration: true,
     },
     icon: __dirname + '/dist/favicon.png',
-    show: false
+    show: true
   });
-
-  win.setMenuBarVisibility(false);
-  // use this object for ipc messaging
-  contents = win.webContents;
 
   if (serve) {
     require('electron-reload')(__dirname, {
@@ -80,7 +70,9 @@ function createWindow() {
     }));
   }
   // JRM edits here
-   win.setResizable(false); // no window resizing for you!
+  win.setMenuBarVisibility(false);
+  win.setResizable(false); // no window resizing for you!
+
   // tray icon and context menu
   const iconPath = path.join(__dirname, './dist/favicon.png');
   let trayIcon = nativeImage.createFromPath(iconPath);
@@ -183,8 +175,21 @@ function toggleShowAll() {
 }
 
 function openPreferences() {
-  logger.info('Open Preferences dialog box.');
-  prefsWindow.show();
+  logger.info('Opened Preferences dialog box.');
+  // const prefsWin = new BrowserWindow({
+  //   width: 800,
+  //   height: 572,
+  //   webPreferences: {
+  //     nodeIntegration: true,
+  //   },
+  //   icon: __dirname + '/dist/favicon.png',
+  //   show: true
+  // });
+
+  // prefsWin.webContents.on('did-finish-load', () => {
+  //   prefsWin.show();
+  //   prefsWin.focus();
+  // });
 }
 
 // ipcMain listener mainChannel
@@ -218,7 +223,8 @@ try {
   app.on('ready', () => {
     // load modal for settings
     // construct alert window
-    createWindow();
+    createMainWindow();
+
   });
 
   // Quit when all windows are closed.
@@ -234,7 +240,7 @@ try {
     // On OS X it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (win === null) {
-      createWindow();
+      createMainWindow();
     }
   });
 

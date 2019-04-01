@@ -1,4 +1,5 @@
 import { HomeComponent } from './components/home/home.component';
+// import { PreferencesComponent } from './components/preferences/preferences.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 

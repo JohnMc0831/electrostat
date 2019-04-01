@@ -78,21 +78,6 @@ export class HomeComponent implements OnInit {
         this.getLastAlert();
       }
     });
-
-    const modal = require('electron-modal');
-    modal.on(path.join(__dirname, '../prefences/preferences.html'), {
-      width: 400,
-      height: 300
-    }, {
-      title: 'electroStat Preferences'
-    }).then((instance) => {
-      instance.on('savePreferences', () => {
-        this.logger.info(`savePreferences event received!`);
-      });
-      instance.on('getPreferences', () => {
-        this.logger.info('getPreferences event received!');
-      });
-    });
   }
 
   initSignalR() {
