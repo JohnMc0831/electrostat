@@ -1,5 +1,5 @@
 import { app, BrowserWindow, remote, ipcRenderer, Tray, Menu } from 'electron';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgModuleFactoryLoader } from '@angular/core';
 import * as $ from 'jquery';
 import * as moment from 'moment';
 import { StatAlert } from '../../models/models';
@@ -54,7 +54,6 @@ export class HomeComponent implements OnInit {
   }
   public alert: StatAlert = new StatAlert();
   renderer: any = ipcRenderer;
-
   ngOnInit() {
     if (this.electronSvc.isElectronApp) {
       this.logger.info('Awakening ipcRenderer...');
@@ -62,7 +61,7 @@ export class HomeComponent implements OnInit {
         'mainChannel',
         'readyForAlerts'
       );
-      this.logger.info(`ipcRenderer is awake!`);
+      this.logger.info(`communication to ipcMain completion status: ${imUp}`);
     }
     this.initSignalR();
     ipcRenderer.on('mainChannel', (event, msg) => {
@@ -79,6 +78,21 @@ export class HomeComponent implements OnInit {
         this.getLastAlert();
       }
     });
+
+    const modal = require('electron-modal');
+    modal.on(path.join(__dirname, '../prefences/preferences.html'), {
+      width: 400,
+      height: 300
+    }, {
+      title: 'electroStat Preferences'
+    }).then((instance) => {
+      instance.on('savePreferences', () => {
+        this.logger.info(`savePreferences event received!`);
+      });
+      instance.on('getPreferences', () => {
+        this.logger.info('getPreferences event received!');
+      });
+    });
   }
 
   initSignalR() {
@@ -92,7 +106,7 @@ export class HomeComponent implements OnInit {
     connection
       .start()
       .then(function() {
-        that.logger.info('signalR sub-system is now connected...');
+        that.logger.info('signalR sub-system is now connected to cloud-hosted service bus.');
       })
       .catch(err => {
         that.logger.error(
@@ -204,7 +218,6 @@ export class HomeComponent implements OnInit {
           }
         });
       });
-      return false; // no alert for you!
     }
 
     // Active Shooter Drill
@@ -238,8 +251,6 @@ export class HomeComponent implements OnInit {
       `Stat alert received at ${moment().format('MM/DD/YYYY hh:mm:ss a')}.`
     );
     this.logger.info(`Alert Title: ${this.alert.title}`);
-    $('#title').text(this.alert.title);
-    this.logger.info(`Received alert!`);
     $('#title').text(this.alert.title);
     $('#narrative').html(this.alert.narrative);
     $('#alertType').text(this.alert.alertLevel);

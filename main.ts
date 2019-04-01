@@ -3,6 +3,9 @@ import * as path from 'path';
 import * as url from 'url';
 import { INTERNAL_BROWSER_DYNAMIC_PLATFORM_PROVIDERS } from '@angular/platform-browser-dynamic/src/platform_providers';
 import * as winston from 'winston';
+const { prefsWindow } = require('@electron-helpers/window-manager');
+const settingsWindow = prefsWindow('preferences', path.join(__dirname, './dist/preferences.html'),
+                                     { width: 400, height: 300 }, { x: 'center', y: 150 });
 
 let win: BrowserWindow;
 let contents: webContents;
@@ -41,6 +44,7 @@ const logger = winston.createLogger({
     })
   ]
 });
+
 
 function createWindow() {
   const electronScreen = screen;
@@ -126,6 +130,14 @@ function createWindow() {
     },
     { type: 'separator' },
     {
+      id: 'preferences',
+      label: 'Preferences',
+      click(item) {
+        openPreferences();
+      }
+    },
+    { type: 'separator' },
+    {
       id: 'exit',
       label: 'Exit',
       role: 'quit'
@@ -154,9 +166,7 @@ function showPastAlerts() {
 }
 
 function seeLastAlert() {
-  // TODO: pass this from ipcMain to ipcRenderer
   logger.info('See Last Alert menuItem was clicked! Sending message to ipcRenderer!');
-  // is playsound is checked, then pass showLastAlertSound
   if (contextmenu.getMenuItemById('playSound').checked) {
     win.webContents.send('mainChannel', 'showLastAlertSound');
   } else {
@@ -170,6 +180,11 @@ function togglePlaySound() {
 
 function toggleShowAll() {
   logger.info('toggleShowAll() was clicked!');
+}
+
+function openPreferences() {
+  logger.info('Open Preferences dialog box.');
+  prefsWindow.show();
 }
 
 // ipcMain listener mainChannel
@@ -200,7 +215,11 @@ try {
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
-  app.on('ready', createWindow);
+  app.on('ready', () => {
+    // load modal for settings
+    // construct alert window
+    createWindow();
+  });
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {
