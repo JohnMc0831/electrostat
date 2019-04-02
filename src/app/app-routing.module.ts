@@ -1,9 +1,13 @@
 import { HomeComponent } from './components/home/home.component';
-// import { PreferencesComponent } from './components/preferences/preferences.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { PreferencesComponent } from './components/preferences/preferences.component';
 
 const routes: Routes = [
+    {
+        path: 'preferences',
+        component: PreferencesComponent
+    },
     {
         path: '',
         component: HomeComponent
@@ -11,7 +15,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-    imports: [RouterModule.forRoot(routes, {useHash: true})],
+    imports: [RouterModule.forRoot(routes, {useHash: true, enableTracing: true})],
     exports: [RouterModule]
 })
 export class AppRoutingModule { }

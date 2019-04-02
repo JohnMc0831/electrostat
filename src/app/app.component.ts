@@ -2,7 +2,24 @@ import { Component } from '@angular/core';
 import { ElectronService } from './providers/electron.service';
 import { TranslateService } from '@ngx-translate/core';
 import { AppConfig } from '../environments/environment';
+import * as winston from 'winston';
 
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.simple(),
+  transports: [
+    new winston.transports.Console({
+      format:
+        winston.format.combine(
+          winston.format.colorize(),
+          winston.format.timestamp({
+            format: 'MM-DD-YYYY HH:mm:ss'
+          }),
+          winston.format.printf(info => `${info.timestamp}: ${info.message}`)
+        ),
+    })
+  ]
+});
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -13,14 +30,14 @@ export class AppComponent {
     private translate: TranslateService) {
 
     translate.setDefaultLang('en');
-    console.log('AppConfig', AppConfig);
+    logger.info(`AppConfig: ${AppConfig}`);
 
     if (electronService.isElectron()) {
-      console.log('Mode electron');
-      console.log('Electron ipcRenderer', electronService.ipcRenderer);
-      console.log('NodeJS childProcess', electronService.childProcess);
+      logger.info('Mode electron');
+      logger.info('Electron ipcRenderer', electronService.ipcRenderer);
+      logger.info('NodeJS childProcess', electronService.childProcess);
     } else {
-      console.log('Mode web');
+      logger.info('Mode web');
     }
   }
 }

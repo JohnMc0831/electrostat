@@ -5,6 +5,7 @@ import { INTERNAL_BROWSER_DYNAMIC_PLATFORM_PROVIDERS } from '@angular/platform-b
 import * as winston from 'winston';
 
 let win: BrowserWindow;
+let prefsWin: BrowserWindow;
 let serve;
 let tray: Tray = null;
 let contextmenu: Menu;
@@ -175,21 +176,33 @@ function toggleShowAll() {
 
 function openPreferences() {
   logger.info('Opened Preferences dialog box.');
-  // const prefsWin = new BrowserWindow({
-  //   width: 800,
-  //   height: 572,
-  //   webPreferences: {
-  //     nodeIntegration: true,
-  //   },
-  //   icon: __dirname + '/dist/favicon.png',
-  //   show: true
-  // });
+  prefsWin = new BrowserWindow({
+    width: 400,
+    height: 300,
+    webPreferences: {
+      nodeIntegration: true,
+    },
+    icon: __dirname + '/dist/favicon.png',
+    show: false
+  });
 
-  // prefsWin.webContents.on('did-finish-load', () => {
-  //   prefsWin.show();
-  //   prefsWin.focus();
-  // });
+  if (serve) {
+    require('electron-reload')(__dirname, {
+      electron: require(`${__dirname}/node_modules/electron`)
+    });
+    win.loadURL('http://localhost:4200/preferences');
+  } else {
+    win.loadURL(url.format({
+      pathname: path.join(__dirname, '/preferences'),
+      protocol: 'file:',
+      slashes: true
+    }));
+  }
+
+  prefsWin.show();
+  prefsWin.focus();
 }
+
 
 // ipcMain listener mainChannel
 ipcMain.on('mainChannel', (event, arg) => {

@@ -1,33 +1,33 @@
-import { app, BrowserWindow, remote, ipcRenderer, Tray, Menu } from "electron";
-import { Component, OnInit, NgModuleFactoryLoader } from "@angular/core";
-import * as $ from "jquery";
-import * as moment from "moment";
-import { StatAlert } from "../../models/models";
-import { ConsoleForElectron } from "winston-console-for-electron";
-import * as winston from "winston";
-import * as signalR from "@aspnet/signalr";
-import * as path from "path";
-import { ElectronService } from "ngx-electron";
-import { Howl, Howler } from "howler";
-import fetch from "electron-fetch";
-import * as ip from "ip";
-import { HOST_ATTR } from "@angular/platform-browser/src/dom/dom_renderer";
+import { app, BrowserWindow, remote, ipcRenderer, Tray, Menu } from 'electron';
+import { Component, OnInit, NgModuleFactoryLoader } from '@angular/core';
+import * as $ from 'jquery';
+import * as moment from 'moment';
+import { StatAlert } from '../../models/models';
+import { ConsoleForElectron } from 'winston-console-for-electron';
+import * as winston from 'winston';
+import * as signalR from '@aspnet/signalr';
+import * as path from 'path';
+import { ElectronService } from 'ngx-electron';
+import { Howl, Howler } from 'howler';
+import fetch from 'electron-fetch';
+import * as ip from 'ip';
+import { HOST_ATTR } from '@angular/platform-browser/src/dom/dom_renderer';
 
 @Component({
-  selector: "app-home",
-  templateUrl: "./home.component.html",
-  styleUrls: ["./home.component.scss"]
+  selector: 'app-preferences',
+  templateUrl: './preferences.component.html',
+  styleUrls: ['./preferences.component.scss']
 })
-export class HomeComponent implements OnInit {
+export class PreferencesComponent implements OnInit {
   public logger: winston.Logger;
   public alertSound: Howl;
   public showAll: boolean;
 
   constructor(private electronSvc: ElectronService) {
-    const tempPath = remote.app.getPath("temp");
-    const logPath = path.join(tempPath, "electoStat.log");
+    const tempPath = remote.app.getPath('temp');
+    const logPath = path.join(tempPath, 'electoStat.log');
     this.logger = winston.createLogger({
-      level: "info",
+      level: 'info',
       format: winston.format.simple(),
       transports: [
         new winston.transports.File({
@@ -35,7 +35,7 @@ export class HomeComponent implements OnInit {
           format: winston.format.combine(
             winston.format.colorize(),
             winston.format.timestamp({
-              format: "MM-DD-YYYY HH:mm:ss"
+              format: 'MM-DD-YYYY HH:mm:ss'
             }),
             winston.format.printf(info => `${info.timestamp}: ${info.message}`)
           )
@@ -44,7 +44,7 @@ export class HomeComponent implements OnInit {
           format: winston.format.combine(
             winston.format.colorize(),
             winston.format.timestamp({
-              format: "MM-DD-YYYY HH:mm:ss"
+              format: 'MM-DD-YYYY HH:mm:ss'
             }),
             winston.format.printf(info => `${info.timestamp}: ${info.message}`)
           )
@@ -56,21 +56,21 @@ export class HomeComponent implements OnInit {
   renderer: any = ipcRenderer;
   ngOnInit() {
     if (this.electronSvc.isElectronApp) {
-      this.logger.info("Awakening ipcRenderer...");
+      this.logger.info('Awakening ipcRenderer...');
       const imUp: string = this.electronSvc.ipcRenderer.sendSync(
-        "mainChannel",
-        "readyForAlerts"
+        'mainChannel',
+        'readyForAlerts'
       );
       this.logger.info(`communication to ipcMain completed!`);
     }
     this.initSignalR();
-    ipcRenderer.on("mainChannel", (event, msg) => {
-      if (msg.indexOf("showLastAlert") > -1) {
-        this.logger.info("showLastAlert received from ipcMain!");
+    ipcRenderer.on('mainChannel', (event, msg) => {
+      if (msg.indexOf('showLastAlert') > -1) {
+        this.logger.info('showLastAlert received from ipcMain!');
         // play sound only if option is enabled
-        if (msg.indexOf("Sound") > -1) {
+        if (msg.indexOf('Sound') > -1) {
           const sound = new Howl({
-            src: ["./assets/Bleep.mp3"]
+            src: ['./assets/Bleep.mp3']
           });
           Howler.volume(1.0);
           sound.play();
@@ -82,9 +82,9 @@ export class HomeComponent implements OnInit {
 
   initSignalR() {
     const that = this;
-    this.logger.info("Initializing signalR client");
+    this.logger.info('Initializing signalR client');
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl("https://stat.uvmhealth.org/alertHub")
+      .withUrl('https://stat.uvmhealth.org/alertHub')
       .configureLogging(signalR.LogLevel.Information)
       .build();
 
@@ -92,7 +92,7 @@ export class HomeComponent implements OnInit {
       .start()
       .then(function() {
         that.logger.info(
-          "signalR sub-system is now connected to cloud-hosted service bus."
+          'signalR sub-system is now connected to cloud-hosted service bus.'
         );
       })
       .catch(err => {
@@ -102,11 +102,11 @@ export class HomeComponent implements OnInit {
       });
 
     // start listening for alerts
-    connection.on("broadcastAlert", alert => {
+    connection.on('broadcastAlert', alert => {
       this.alert = alert;
       this.showAll = this.electronSvc.ipcRenderer.sendSync(
-        "mainChannel",
-        "showAll"
+        'mainChannel',
+        'showAll'
       );
       this.logger.info(`showAllAlerts is ${this.alert.showAll}`);
       const inScope: boolean = this.amIInScope();
@@ -126,19 +126,19 @@ export class HomeComponent implements OnInit {
     const that = this;
 
     this.showAll = this.electronSvc.ipcRenderer.sendSync(
-      "mainChannel",
-      "showAll"
+      'mainChannel',
+      'showAll'
     );
     if (this.showAll) {
       that.logger.info(
-        "The user has opted to display ALL alerts.  This alert WILL be displayed!"
+        'The user has opted to display ALL alerts.  This alert WILL be displayed!'
       );
       return true;
     }
     // Alert was sent everywhere.
     if (this.alert.sendAll) {
       that.logger.info(
-        "This alert has the sendAll flag set.  It WILL be shown!"
+        'This alert has the sendAll flag set.  It WILL be shown!'
       );
       return true;
     }
@@ -146,14 +146,14 @@ export class HomeComponent implements OnInit {
     // Location scope
     const address: string = ip.address();
     that.logger.info(`Current IP Address: ${address}`);
-    this.alert.affectedVlans = "10.32.74.0";
+    this.alert.affectedVlans = '10.32.74.0';
     if (address && this.alert.affectedVlans) {
       that.logger.info(
-        "This alert is intended to displayed only in certain locations."
+        'This alert is intended to displayed only in certain locations.'
       );
-      that.logger.info("Evaluating whether this location is in scope...");
-      const lastDot = address.lastIndexOf(".");
-      const subnet = address.substr(0, lastDot) + ".0";
+      that.logger.info('Evaluating whether this location is in scope...');
+      const lastDot = address.lastIndexOf('.');
+      const subnet = address.substr(0, lastDot) + '.0';
       that.logger.info(`Device subnet is ${subnet}.`);
       if (this.alert.affectedVlans.includes(subnet)) {
         that.logger.info(
@@ -172,14 +172,14 @@ export class HomeComponent implements OnInit {
     const username = process.env.username || process.env.user;
     this.logger.info(`Current user: ${username}`);
     const config = {
-      scope: "sub",
-      includeMembership: ["user"],
-      url: "ldap://fahc.fletcherallen.org",
-      baseDN: "dc=fahc,dc=fletcherallen,dc=org",
-      username: "a212502@uvmhealth.org",
-      password: "Tits&wine!" // <-- I hexedited the compiled binary and this is properly obfuscated.
+      scope: 'sub',
+      includeMembership: ['user'],
+      url: 'ldap://fahc.fletcherallen.org',
+      baseDN: 'dc=fahc,dc=fletcherallen,dc=org',
+      username: 'a212502@uvmhealth.org',
+      password: 'Tits&wine!' // <-- I hexedited the compiled binary and this is properly obfuscated.
     };
-    const ActiveDirectory = require("activedirectory");
+    const ActiveDirectory = require('activedirectory');
     const ad = new ActiveDirectory(config);
     // ad.findUser(username, function(err, u) {
     //   if (err) {
@@ -193,15 +193,15 @@ export class HomeComponent implements OnInit {
     that.logger.info(
       `Checking to see if group targeted applies to this user: ${username}.`
     );
-    that.alert.affectedGroups = ".IS Leadership,FAHC Staff";
-    ad.findUser("m212502", function(err, usr) {
+    that.alert.affectedGroups = '.IS Leadership,FAHC Staff';
+    ad.findUser('m212502', function(err, usr) {
       if (err) {
         that.logger.error(`Error connecting to AD: ${err}`);
       }
 
       if (usr) {
         if (that.alert.affectedGroups) {
-          const grps = that.alert.affectedGroups.split(",");
+          const grps = that.alert.affectedGroups.split(',');
           grps.forEach(function(grp) {
             // for every group targeted by the alert
             ad.isUserMemberOf(usr, grp, function(e, isMember) {
@@ -221,7 +221,7 @@ export class HomeComponent implements OnInit {
           });
         }
       } else {
-        that.logger.error("User object is null!  Lookup failed!");
+        that.logger.error('User object is null!  Lookup failed!');
       }
     });
 
@@ -253,14 +253,14 @@ export class HomeComponent implements OnInit {
 
   displayAlert() {
     this.logger.info(
-      `Stat alert received at ${moment().format("MM/DD/YYYY hh:mm:ss a")}.`
+      `Stat alert received at ${moment().format('MM/DD/YYYY hh:mm:ss a')}.`
     );
     this.logger.info(`Alert Title: ${this.alert.title}`);
-    $("#title").text(this.alert.title);
-    $("#narrative").html(this.alert.narrative);
-    $("#alertType").text(this.alert.alertLevel);
-    $("#alertSent").text(
-      moment(this.alert.alertTime).format("MM/DD/YYYY hh:mm:ss a")
+    $('#title').text(this.alert.title);
+    $('#narrative').html(this.alert.narrative);
+    $('#alertType').text(this.alert.alertLevel);
+    $('#alertSent').text(
+      moment(this.alert.alertTime).format('MM/DD/YYYY hh:mm:ss a')
     );
     this.setAlertWindowColors();
     const win = remote.getCurrentWindow();
@@ -275,17 +275,17 @@ export class HomeComponent implements OnInit {
 
   getLastAlert() {
     const that = this;
-    this.logger.info("Getting most recent alert from REST API.");
+    this.logger.info('Getting most recent alert from REST API.');
     $.ajax({
-      url: "https://stat.uvmhealth.org/api/alerts/mostrecent/",
+      url: 'https://stat.uvmhealth.org/api/alerts/mostrecent/',
       async: true,
-      dataType: "json",
-      type: "GET"
+      dataType: 'json',
+      type: 'GET'
     }).always(function(alert) {
       that.logger.info(`Retrieved alert ${alert}.`);
       that.alert = alert;
       that.logger.info(
-        `Stat alert received at ${moment().format("MM/DD/YYYY hh:mm:ss a")}.`
+        `Stat alert received at ${moment().format('MM/DD/YYYY hh:mm:ss a')}.`
       );
       that.logger.info(
         `Alert Title: ${that.alert.title} was sent at ${that.alert.alertTime}`
@@ -298,13 +298,13 @@ export class HomeComponent implements OnInit {
   setAlertWindowColors() {
     this.logger.info(`Alert level is ${this.alert.alertLevel}`);
     const at = `${this.alert.alertLevel.toLowerCase()}Alert`;
-    const atText = at + "Text";
-    $("#alertWindow")
-      .removeClass("gradientBackground")
+    const atText = at + 'Text';
+    $('#alertWindow')
+      .removeClass('gradientBackground')
       .addClass(at);
-    $("#title").addClass(at);
-    $("#narrative").addClass(atText);
-    $("#at").addClass(at);
-    $("#as").addClass(at);
+    $('#title').addClass(at);
+    $('#narrative').addClass(atText);
+    $('#at').addClass(at);
+    $('#as').addClass(at);
   }
 }
