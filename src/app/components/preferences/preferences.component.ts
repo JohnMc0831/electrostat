@@ -10,6 +10,8 @@ import { Howl, Howler } from 'howler';
 import fetch from 'electron-fetch';
 import * as ip from 'ip';
 import { HOST_ATTR } from '@angular/platform-browser/src/dom/dom_renderer';
+import * as jetpack from 'fs-jetpack';
+import { Preferences } from '../../models/models';
 
 @Component({
   selector: 'app-preferences',
@@ -21,6 +23,10 @@ export class PreferencesComponent implements OnInit {
   public alertSound: Howl;
   public showAll: boolean;
   public icon: string;
+  public prefs: Preferences = new Preferences();
+  private userAuthenticated = false;
+  public userSettingsFolder = remote.app.getPath('userData');
+  public configFile = path.join(this.userSettingsFolder, 'electroStatPreferences.json');
 
   constructor(private electronSvc: ElectronService) {
     const tempPath = remote.app.getPath('temp');
@@ -70,15 +76,51 @@ export class PreferencesComponent implements OnInit {
     }
 
     $('#btnSavePrefs').on('click', function(e) {
-      // TODO:  Save to json config file in programdata/appuser/etc.
       that.logger.info('User requested a Save on Preferences!');
-      alert('Save would occur here!');
-      that.electronSvc.ipcRenderer.sendSync('prefsChannel', 'cancelPreferences');
+      that.savePreferences();
+      that.electronSvc.ipcRenderer.sendSync('prefsChannel', 'closePreferences');
     });
 
     $('#btnCancelPrefs').on('click', function(e) {
       that.logger.info('Sending cancellatioun message from Preferences!');
       that.electronSvc.ipcRenderer.sendSync('prefsChannel', 'cancelPreferences');
     });
+
+    $('#chkIsKiosk').on('click', function() {
+      if ($('#chkIsKiosk').is(':checked')) {
+        $('#numSecondsToShow').val(5);
+        $('#numSecondsToShow').prop('disabled', false);
+      } else {
+        $('#numSecondsToShow').val('');
+        $('#numSecondsToShow').prop('disabled', true);
+      }
+    });
+
+    this.readPreferences();
+  }
+
+  savePreferences() {
+    this.logger.info(`Saving electroStat client configuration preferences to settings file: ${this.configFile}`);
+    this.prefs.isKiosk = $('#chkIsKiosk').is(':checked');
+    this.prefs.numSecondsToDisplay = this.prefs.isKiosk ? $('#numSecondsToShow').val().toString() : '';
+    this.prefs.userAuthenticated = this.userAuthenticated;
+    this.prefs.userName = $('#userId').val().toString();
+    const jsonPrefs = JSON.stringify(this.prefs);
+    jetpack.write(this.configFile, jsonPrefs, { 'jsonIndent': 4});
+    this.logger.info(`Wrote electroStat client configuration preferences to settings file successfully!`);
+  }
+
+  readPreferences() {
+    this.prefs = jetpack.read(this.configFile, 'json');
+    if (this.prefs.isKiosk) {
+      $('#chkIsKiosk').prop('checked', true);
+      $('#numSecondsToShow').val(this.prefs.numSecondsToDisplay);
+      $('#numSecondsToShow').prop('disabled', false);
+    } else {
+      $('#chkIsKiosk').prop('checked', false);
+      $('#numSecondsToShow').val('');
+      $('#numSecondsToShow').prop('disabled', true);
+    }
+    this.logger.info('Set preferences to last saved configuration.');
   }
 }

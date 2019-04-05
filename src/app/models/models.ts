@@ -1,3 +1,11 @@
+export class Preferences {
+  constructor() {}
+  isKiosk: boolean;
+  numSecondsToDisplay: string;
+  userAuthenticated: boolean;
+  userName: string;
+}
+
 export class StatAlert {
   constructor() {}
   title: string;

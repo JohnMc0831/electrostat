@@ -232,6 +232,10 @@ ipcMain.on('prefsChannel', (event, arg) => {
     case 'cancelPreferences':
       logger.info('ipcRenderer (Preferences) requested window cancellation.');
       prefsWin.hide();
+      break;
+    case 'closePreferences':
+      logger.info('ipcRenderer (Preferences) requested window closure.');
+      prefsWin.hide();
   }
 });
 
