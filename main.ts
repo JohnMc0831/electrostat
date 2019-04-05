@@ -5,14 +5,16 @@ import { INTERNAL_BROWSER_DYNAMIC_PLATFORM_PROVIDERS } from '@angular/platform-b
 import * as winston from 'winston';
 
 let win: BrowserWindow;
-let prefsWin: BrowserWindow;
 let serve;
 let tray: Tray = null;
 let contextmenu: Menu;
+// tslint:disable-next-line:prefer-const
+let prefsWin: BrowserWindow;
 const tempPath = app.getPath('temp');
 const logPath = path.join(tempPath, 'electoStat.log');
 const args = process.argv.slice(1);
 serve = args.some(val => val === '--serve');
+
 const logger = winston.createLogger({
   level: 'info',
   format: winston.format.simple(),
@@ -55,7 +57,7 @@ function createMainWindow() {
       nodeIntegration: true,
     },
     icon: __dirname + '/dist/favicon.png',
-    show: true
+    show: false
   });
 
   if (serve) {
@@ -175,10 +177,10 @@ function toggleShowAll() {
 }
 
 function openPreferences() {
-  logger.info('Opened Preferences dialog box.');
+  logger.info('ipcMain transmitting openPreferences command.');
   prefsWin = new BrowserWindow({
-    width: 400,
-    height: 300,
+    width: 800,
+    height: 600,
     webPreferences: {
       nodeIntegration: true,
     },
@@ -186,18 +188,12 @@ function openPreferences() {
     show: false
   });
 
-  if (serve) {
-    require('electron-reload')(__dirname, {
-      electron: require(`${__dirname}/node_modules/electron`)
-    });
-    win.loadURL('http://localhost:4200/preferences');
-  } else {
-    win.loadURL(url.format({
-      pathname: path.join(__dirname, '/preferences'),
-      protocol: 'file:',
-      slashes: true
-    }));
-  }
+  prefsWin.loadURL(url.format({
+    pathname: path.join(__dirname, 'dist/index.html'),
+    protocol: 'file:',
+    slashes: true,
+    hash: '/preferences'
+  }));
 
   prefsWin.show();
   prefsWin.focus();
@@ -223,6 +219,15 @@ ipcMain.on('mainChannel', (event, arg) => {
       event.returnValue = contextmenu.getMenuItemById('showAllAlerts').checked;
       break;
     default:
+      break;
+  }
+});
+
+ipcMain.on('prefsChannel', (event, arg) => {
+  switch (arg) {
+    case 'readyForAlerts':
+      logger.info('ipcRenderer (Preferences) is ready!');
+      event.returnValue = 'Hola Amigo!';
       break;
   }
 });

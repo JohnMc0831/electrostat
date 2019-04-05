@@ -1,5 +1,6 @@
 import { app, BrowserWindow, remote, ipcRenderer, Tray, Menu } from 'electron';
 import { Component, OnInit, NgModuleFactoryLoader } from '@angular/core';
+import * as url from 'url';
 import * as $ from 'jquery';
 import * as moment from 'moment';
 import { StatAlert } from '../../models/models';
@@ -22,6 +23,7 @@ export class PreferencesComponent implements OnInit {
   public logger: winston.Logger;
   public alertSound: Howl;
   public showAll: boolean;
+  public icon: string;
 
   constructor(private electronSvc: ElectronService) {
     const tempPath = remote.app.getPath('temp');
@@ -52,259 +54,23 @@ export class PreferencesComponent implements OnInit {
       ]
     });
   }
-  public alert: StatAlert = new StatAlert();
   renderer: any = ipcRenderer;
+
   ngOnInit() {
     if (this.electronSvc.isElectronApp) {
       this.logger.info('Awakening ipcRenderer...');
       const imUp: string = this.electronSvc.ipcRenderer.sendSync(
-        'mainChannel',
+        'prefsChannel',
         'readyForAlerts'
       );
-      this.logger.info(`communication to ipcMain completed!`);
-    }
-    this.initSignalR();
-    ipcRenderer.on('mainChannel', (event, msg) => {
-      if (msg.indexOf('showLastAlert') > -1) {
-        this.logger.info('showLastAlert received from ipcMain!');
-        // play sound only if option is enabled
-        if (msg.indexOf('Sound') > -1) {
-          const sound = new Howl({
-            src: ['./assets/Bleep.mp3']
-          });
-          Howler.volume(1.0);
-          sound.play();
-        }
-        this.getLastAlert();
-      }
-    });
-  }
-
-  initSignalR() {
-    const that = this;
-    this.logger.info('Initializing signalR client');
-    const connection = new signalR.HubConnectionBuilder()
-      .withUrl('https://stat.uvmhealth.org/alertHub')
-      .configureLogging(signalR.LogLevel.Information)
-      .build();
-
-    connection
-      .start()
-      .then(function() {
-        that.logger.info(
-          'signalR sub-system is now connected to cloud-hosted service bus.'
-        );
-      })
-      .catch(err => {
-        that.logger.error(
-          `An exception occurred starting the signalR client: ${err}`
-        );
+      this.logger.info(`communication to ipcMain completed! ${imUp}`);
+      this.icon = url.format({
+        pathname: path.join(__dirname, 'assets/stat.png'),
+        protocol: 'file:',
+        slashes: true
       });
-
-    // start listening for alerts
-    connection.on('broadcastAlert', alert => {
-      this.alert = alert;
-      this.showAll = this.electronSvc.ipcRenderer.sendSync(
-        'mainChannel',
-        'showAll'
-      );
-      this.logger.info(`showAllAlerts is ${this.alert.showAll}`);
-      const inScope: boolean = this.amIInScope();
-      if (this.showAll || inScope) {
-        this.displayAlert();
-      } else {
-        this.logger.info(
-          `Not displaying the alert with title ${
-            this.alert.title
-          } as this device and/or user is not in scope.`
-        );
-      }
-    });
-  }
-
-  amIInScope() {
-    const that = this;
-
-    this.showAll = this.electronSvc.ipcRenderer.sendSync(
-      'mainChannel',
-      'showAll'
-    );
-    if (this.showAll) {
-      that.logger.info(
-        'The user has opted to display ALL alerts.  This alert WILL be displayed!'
-      );
-      return true;
     }
-    // Alert was sent everywhere.
-    if (this.alert.sendAll) {
-      that.logger.info(
-        'This alert has the sendAll flag set.  It WILL be shown!'
-      );
-      return true;
-    }
-
-    // Location scope
-    const address: string = ip.address();
-    that.logger.info(`Current IP Address: ${address}`);
-    this.alert.affectedVlans = '10.32.74.0';
-    if (address && this.alert.affectedVlans) {
-      that.logger.info(
-        'This alert is intended to displayed only in certain locations.'
-      );
-      that.logger.info('Evaluating whether this location is in scope...');
-      const lastDot = address.lastIndexOf('.');
-      const subnet = address.substr(0, lastDot) + '.0';
-      that.logger.info(`Device subnet is ${subnet}.`);
-      if (this.alert.affectedVlans.includes(subnet)) {
-        that.logger.info(
-          `Matched VLAN/Subnet: ${subnet}.  The alert WILL be displayed.`
-        );
-        return true;
-      } else {
-        that.logger.info(`Found no matching VLAN/Subnet: ${subnet}!`);
-      }
-    }
-
-    // Groups scope
-    // Get the current user
-    // So, I'm pretty sure that this will work in Windows, but I really have no idea
-    // yet on how to handle on OS X / Linux...hmmm....
-    const username = process.env.username || process.env.user;
-    this.logger.info(`Current user: ${username}`);
-    const config = {
-      scope: 'sub',
-      includeMembership: ['user'],
-      url: 'ldap://fahc.fletcherallen.org',
-      baseDN: 'dc=fahc,dc=fletcherallen,dc=org',
-      username: 'a212502@uvmhealth.org',
-      password: 'Tits&wine!' // <-- I hexedited the compiled binary and this is properly obfuscated.
-    };
-    const ActiveDirectory = require('activedirectory');
-    const ad = new ActiveDirectory(config);
-    // ad.findUser(username, function(err, u) {
-    //   if (err) {
-    //     that.logger.error(`Error: ${err}`);
-    //   } else {
-    //     that.logger.info(`Retrieved user: ${JSON.stringify(u)}`);
-    //   }
-    //   that.logger.info('AD call completed.');
-    // });
-
-    that.logger.info(
-      `Checking to see if group targeted applies to this user: ${username}.`
-    );
-    that.alert.affectedGroups = '.IS Leadership,FAHC Staff';
-    ad.findUser('m212502', function(err, usr) {
-      if (err) {
-        that.logger.error(`Error connecting to AD: ${err}`);
-      }
-
-      if (usr) {
-        if (that.alert.affectedGroups) {
-          const grps = that.alert.affectedGroups.split(',');
-          grps.forEach(function(grp) {
-            // for every group targeted by the alert
-            ad.isUserMemberOf(usr, grp, function(e, isMember) {
-              if (err) {
-                that.logger.error(
-                  `An error occurred determining is ${username} is a member of ${grp}:  ${e}`
-                );
-                return;
-              }
-              that.logger.info(
-                `${username} is a member of ${grp}:  ${isMember}`
-              );
-              if (isMember) {
-                return true;
-              }
-            });
-          });
-        }
-      } else {
-        that.logger.error('User object is null!  Lookup failed!');
-      }
-    });
-
-    // Active Shooter Drill
-    // let mail: string;
-    // ad.findUser(username, function(err, user) {
-    //   if (err) {
-    //     that.logger.error(`Couldn't find user ${username}!  Exception: ${err}.`);
-    //     return false;
-    //   }
-
-    //   if (!user) {
-    //     that.logger.error(`Couldn't find user ${username}!`);
-    //     return false;
-    //   }
-    //   // get current user's email address
-    //   mail = user.mail;
-    // });
-
-    // const targets = this.alert.targets.split(',');
-    // targets.forEach(function(value) {
-    // if (value === mail) {
-    //   return true; // participating in the drill
-    // }
-    // });
-
-    return false; // no alert for you!
   }
 
-  displayAlert() {
-    this.logger.info(
-      `Stat alert received at ${moment().format('MM/DD/YYYY hh:mm:ss a')}.`
-    );
-    this.logger.info(`Alert Title: ${this.alert.title}`);
-    $('#title').text(this.alert.title);
-    $('#narrative').html(this.alert.narrative);
-    $('#alertType').text(this.alert.alertLevel);
-    $('#alertSent').text(
-      moment(this.alert.alertTime).format('MM/DD/YYYY hh:mm:ss a')
-    );
-    this.setAlertWindowColors();
-    const win = remote.getCurrentWindow();
-    win.show();
-  }
 
-  ackAlert() {
-    const win = remote.getCurrentWindow();
-    win.hide();
-    // TODO:  Actually ack the alert via signalR
-  }
-
-  getLastAlert() {
-    const that = this;
-    this.logger.info('Getting most recent alert from REST API.');
-    $.ajax({
-      url: 'https://stat.uvmhealth.org/api/alerts/mostrecent/',
-      async: true,
-      dataType: 'json',
-      type: 'GET'
-    }).always(function(alert) {
-      that.logger.info(`Retrieved alert ${alert}.`);
-      that.alert = alert;
-      that.logger.info(
-        `Stat alert received at ${moment().format('MM/DD/YYYY hh:mm:ss a')}.`
-      );
-      that.logger.info(
-        `Alert Title: ${that.alert.title} was sent at ${that.alert.alertTime}`
-      );
-      const inScope: boolean = that.amIInScope();
-      that.displayAlert();
-    });
-  }
-
-  setAlertWindowColors() {
-    this.logger.info(`Alert level is ${this.alert.alertLevel}`);
-    const at = `${this.alert.alertLevel.toLowerCase()}Alert`;
-    const atText = at + 'Text';
-    $('#alertWindow')
-      .removeClass('gradientBackground')
-      .addClass(at);
-    $('#title').addClass(at);
-    $('#narrative').addClass(atText);
-    $('#at').addClass(at);
-    $('#as').addClass(at);
-  }
 }

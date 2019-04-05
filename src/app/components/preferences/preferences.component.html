@@ -1,25 +1,24 @@
 <div id="prefsWindow" class="gradientBackground">
     <div class="container">
       <div class="row text-center">
-        <div class="col-lg-12 text-center">
-          <h1 id="title">ElectroStat Preferences</h1>
+        <div class="col-lg-6">
+          <img [src]='icon' />
+          <h3 class='headline' id="title">Preferences</h3>
+        </div>
+        <div class=col-lg-6>
+          
         </div>
       </div>
       <hr />
       <div class="row">
        
       <div class="container champlainBlue">
-        <div class="row">
-          <div class="col fatHead">
-
-          </div>
-          <div class="col text-center fatHead">
-
-          </div>
-          <div class="col text-right fatHead">
-
-          </div>
-        </div>
+        <h4>Alert Settings</h4>
+        <input clas='form-control' type='checkbox' id='chkIsKiosk' /><label>This is a kiosk.</label><br />
+        <label>Display alerts for this long: </label><input type='number' style='max-width:30px;' class='form-control' id='numSecondsToShow' /> seconds<br />
+        <h4>Identity</h4>
+        <p>Authenticate with your UVM Health account and current Windows password to ensure you receive all alerts.</p>
+        <a id='btnAuthenticate' class='btn btn-info btn-lg'>Authenticate</a>
       </div>
     </div>
 </div>
