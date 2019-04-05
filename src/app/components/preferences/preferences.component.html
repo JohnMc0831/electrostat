@@ -1,24 +1,51 @@
-<div id="prefsWindow" class="gradientBackground">
+  <div id="prefsWindow" class="background">
     <div class="container">
       <div class="row text-center">
         <div class="col-lg-6">
           <img [src]='icon' />
           <h3 class='headline' id="title">Preferences</h3>
         </div>
-        <div class=col-lg-6>
-          
-        </div>
       </div>
       <hr />
       <div class="row">
-       
-      <div class="container champlainBlue">
-        <h4>Alert Settings</h4>
-        <input clas='form-control' type='checkbox' id='chkIsKiosk' /><label>This is a kiosk.</label><br />
-        <label>Display alerts for this long: </label><input type='number' style='max-width:30px;' class='form-control' id='numSecondsToShow' /> seconds<br />
-        <h4>Identity</h4>
-        <p>Authenticate with your UVM Health account and current Windows password to ensure you receive all alerts.</p>
-        <a id='btnAuthenticate' class='btn btn-info btn-lg'>Authenticate</a>
+        <div class="container champlainBlue">
+          <h4>Alert Settings</h4>
+          <input clas='form-control' type='checkbox' id='chkIsKiosk' /> 
+          <label class='form-check-label' style='margin-left: 20px;'>This is a non-interactive desktop (No keyboard/mouse).</label>
+          <br /><br />
+          <input type='number' style='max-width:60px; display: inline-block;' class='form-control' id='numSecondsToShow' name='displaySeconds' min='5' max='60' /> 
+          <label style='margin-left: 20px;'>Display alerts for this long (seconds)</label><br />
+          <hr />
+          <h4>Identity</h4>
+          <p>Authenticate with your UVM Health account to ensure you receive all alerts.</p>
+          <div class='row'>
+            <div class='col-sm-3'>
+              <label>Your UVM Health ID:</label>
+            </div>
+            <div class='col-sm-8'>
+              <input type='text' class='form-control' id='userId' placeholder="Someone@uvmhealth.org" />
+            </div>
+          </div>
+          <div class='row fatHead'>
+              <div class='col-sm-3'>
+                  <label>Your password:</label>
+                </div>
+                <div class='col-sm-8'>
+                  <input class='form-control' type='password' id='userPass' />
+                </div>
+          </div>
+          <div class='row fatHead'>
+            <div class='col-lg-12 text-center'>
+              <button type="button" id='btnAuthenticate' class='btn btn-outline-light btn-lg'>Authenticate</button>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-</div>
+      <hr />
+      <div class='row'>
+        <div class='col-lg-12 text-center'>
+          <button type="button" class='btn btn-outline-success' id='btnSavePrefs'>Save</button>&nbsp;&nbsp;
+          <button type="button" class='btn btn-outline-secondary' id='btnCancelPrefs'>Cancel</button>
+        </div>
+      </div>
+  </div>

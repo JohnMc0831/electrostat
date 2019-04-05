@@ -229,6 +229,9 @@ ipcMain.on('prefsChannel', (event, arg) => {
       logger.info('ipcRenderer (Preferences) is ready!');
       event.returnValue = 'Hola Amigo!';
       break;
+    case 'cancelPreferences':
+      logger.info('ipcRenderer (Preferences) requested window cancellation.');
+      prefsWin.hide();
   }
 });
 

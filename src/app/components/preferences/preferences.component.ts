@@ -1,13 +1,10 @@
 import { app, BrowserWindow, remote, ipcRenderer, Tray, Menu } from 'electron';
 import { Component, OnInit, NgModuleFactoryLoader } from '@angular/core';
+import * as path from 'path';
 import * as url from 'url';
 import * as $ from 'jquery';
-import * as moment from 'moment';
-import { StatAlert } from '../../models/models';
 import { ConsoleForElectron } from 'winston-console-for-electron';
 import * as winston from 'winston';
-import * as signalR from '@aspnet/signalr';
-import * as path from 'path';
 import { ElectronService } from 'ngx-electron';
 import { Howl, Howler } from 'howler';
 import fetch from 'electron-fetch';
@@ -57,6 +54,7 @@ export class PreferencesComponent implements OnInit {
   renderer: any = ipcRenderer;
 
   ngOnInit() {
+    const that = this;
     if (this.electronSvc.isElectronApp) {
       this.logger.info('Awakening ipcRenderer...');
       const imUp: string = this.electronSvc.ipcRenderer.sendSync(
@@ -70,7 +68,17 @@ export class PreferencesComponent implements OnInit {
         slashes: true
       });
     }
+
+    $('#btnSavePrefs').on('click', function(e) {
+      // TODO:  Save to json config file in programdata/appuser/etc.
+      that.logger.info('User requested a Save on Preferences!');
+      alert('Save would occur here!');
+      that.electronSvc.ipcRenderer.sendSync('prefsChannel', 'cancelPreferences');
+    });
+
+    $('#btnCancelPrefs').on('click', function(e) {
+      that.logger.info('Sending cancellatioun message from Preferences!');
+      that.electronSvc.ipcRenderer.sendSync('prefsChannel', 'cancelPreferences');
+    });
   }
-
-
 }

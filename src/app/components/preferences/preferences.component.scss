@@ -3,3 +3,17 @@
     vertical-align: middle;
     margin-left: 10px;
 }
+
+.background {
+    background: lightblue;
+    /*background: radial-gradient(circle, rgba(255,255,255,1) 74%, rgba(148,187,233,1) 100%);*/
+    overflow: hidden; 
+    margin: 0;
+    height: 100%;
+    width: 100%;
+  }
+
+  .fatHead {
+    margin-top: 5px;
+  }
+  
