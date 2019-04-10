@@ -57,7 +57,7 @@ function createMainWindow() {
       nodeIntegration: true,
     },
     icon: __dirname + '/dist/favicon.png',
-    show: false
+    show: true
   });
 
   if (serve) {

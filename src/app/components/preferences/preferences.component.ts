@@ -12,6 +12,7 @@ import * as ip from 'ip';
 import { HOST_ATTR } from '@angular/platform-browser/src/dom/dom_renderer';
 import * as jetpack from 'fs-jetpack';
 import { Preferences } from '../../models/models';
+import * as adal from 'adal-node';
 
 @Component({
   selector: 'app-preferences',
@@ -27,6 +28,8 @@ export class PreferencesComponent implements OnInit {
   private userAuthenticated = false;
   public userSettingsFolder = remote.app.getPath('userData');
   public configFile = path.join(this.userSettingsFolder, 'electroStatPreferences.json');
+  private AuthenticationContext = adal.AuthenticationContext;
+  private adalLog = adal.Logging;
 
   constructor(private electronSvc: ElectronService) {
     const tempPath = remote.app.getPath('temp');
@@ -75,6 +78,18 @@ export class PreferencesComponent implements OnInit {
       });
     }
 
+
+    this.adalLog.setLoggingOptions({
+      level: 3,   // verbose
+      log : function(level, message, error) {
+        if (error) {
+          that.logger.error(message);
+        } else {
+          that.logger.info(message);
+        }
+      }
+    });
+
     $('#btnSavePrefs').on('click', function(e) {
       that.logger.info('User requested a Save on Preferences!');
       that.savePreferences();
@@ -122,5 +137,49 @@ export class PreferencesComponent implements OnInit {
       $('#numSecondsToShow').prop('disabled', true);
     }
     this.logger.info('Set preferences to last saved configuration.');
+  }
+
+ async authMe() {
+    const that = this;
+    this.logger.info('Authenticating with user-provided credentials.');
+    const authParameters = {
+        tenant: 'FAHC.onmicrosoft.com',
+        authorityHostUrl: 'https://login.windows.net',
+        clientId: '64978961-b044-4f8a-b5a4-e812f5ab93ff',
+        username: $('#userId').val().toString(),
+        password: $('#userPass').val().toString()
+      };
+
+    const authorityUrl = authParameters.authorityHostUrl + '/' + authParameters.tenant;
+    const resource = '00000002-0000-0000-c000-000000000000';
+    const context = new this.AuthenticationContext(authorityUrl);
+
+    context.acquireTokenWithUsernamePassword(resource, authParameters.username, authParameters.password,
+      authParameters.clientId, async function(err, tokenResponse: adal.TokenResponse) {
+      if (err) {
+        that.logger.error('well that didn\'t work: ' + err.stack);
+        $('#userId').removeClass('authenticated').addClass('notAuthenticated');
+        $('#userPass').removeClass('authenticated').addClass('notAuthenticated');
+      } else {
+        that.logger.info(`Successfully authenticated with token:  ${tokenResponse.accessToken}`);
+        let groups: any;
+        const graphUrl = 'https://graph.microsoft.com/v1.0/me/memberOf';
+        fetch(graphUrl, { method: 'GET', headers: { 'Authorization': 'Bearer ' + tokenResponse.accessToken }
+        }).then((response) => {
+            response.json().then((res) => {
+                groups = res.value;
+                for (const grp of groups) {
+                    this.logger.info(`Found group: ${grp.DisplayName}`);
+                }
+            });
+        }).catch((error) => {
+            this.logger.error(error);
+        });
+
+        that.logger.info(`Found ${groups.length()} group memberships for ${authParameters.username}`);
+        $('#userId').removeClass('notAuthenticated').addClass('authenticated');
+        $('#userPass').removeClass('notAuthenticated').addClass('authenticated');
+      }
+    });
   }
 }
