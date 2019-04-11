@@ -4,6 +4,7 @@ export class Preferences {
   numSecondsToDisplay: string;
   userAuthenticated: boolean;
   userName: string;
+  userGroups: string;
 }
 
 export class StatAlert {

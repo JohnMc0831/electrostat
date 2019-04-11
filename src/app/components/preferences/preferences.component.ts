@@ -13,6 +13,7 @@ import { HOST_ATTR } from '@angular/platform-browser/src/dom/dom_renderer';
 import * as jetpack from 'fs-jetpack';
 import { Preferences } from '../../models/models';
 import * as adal from 'adal-node';
+import * as MicrosoftGraph from '@microsoft/microsoft-graph-client';
 
 @Component({
   selector: 'app-preferences',
@@ -28,8 +29,8 @@ export class PreferencesComponent implements OnInit {
   private userAuthenticated = false;
   public userSettingsFolder = remote.app.getPath('userData');
   public configFile = path.join(this.userSettingsFolder, 'electroStatPreferences.json');
-  private AuthenticationContext = adal.AuthenticationContext;
-  private adalLog = adal.Logging;
+  public adalLog = adal.Logging;
+  public groupsList: string;
 
   constructor(private electronSvc: ElectronService) {
     const tempPath = remote.app.getPath('temp');
@@ -60,6 +61,7 @@ export class PreferencesComponent implements OnInit {
       ]
     });
   }
+
   renderer: any = ipcRenderer;
 
   ngOnInit() {
@@ -78,14 +80,13 @@ export class PreferencesComponent implements OnInit {
       });
     }
 
-
-    this.adalLog.setLoggingOptions({
+    that.adalLog.setLoggingOptions({
       level: 3,   // verbose
       log : function(level, message, error) {
         if (error) {
-          that.logger.error(message);
+          console.error(message);
         } else {
-          that.logger.info(message);
+          console.log(message);
         }
       }
     });
@@ -120,6 +121,7 @@ export class PreferencesComponent implements OnInit {
     this.prefs.numSecondsToDisplay = this.prefs.isKiosk ? $('#numSecondsToShow').val().toString() : '';
     this.prefs.userAuthenticated = this.userAuthenticated;
     this.prefs.userName = $('#userId').val().toString();
+    this.prefs.userGroups = this.groupsList;
     const jsonPrefs = JSON.stringify(this.prefs);
     jetpack.write(this.configFile, jsonPrefs, { 'jsonIndent': 4});
     this.logger.info(`Wrote electroStat client configuration preferences to settings file successfully!`);
@@ -139,9 +141,10 @@ export class PreferencesComponent implements OnInit {
     this.logger.info('Set preferences to last saved configuration.');
   }
 
- async authMe() {
+ authMe() {
+    const userId = $('#userId').val().toString();
     const that = this;
-    this.logger.info('Authenticating with user-provided credentials.');
+    that.logger.info('Authenticating with user-provided credentials.');
     const authParameters = {
         tenant: 'FAHC.onmicrosoft.com',
         authorityHostUrl: 'https://login.windows.net',
@@ -151,34 +154,42 @@ export class PreferencesComponent implements OnInit {
       };
 
     const authorityUrl = authParameters.authorityHostUrl + '/' + authParameters.tenant;
-    const resource = '00000002-0000-0000-c000-000000000000';
-    const context = new this.AuthenticationContext(authorityUrl);
+    const resource = 'https://graph.microsoft.com';
+    const context = new adal.AuthenticationContext(authorityUrl);
+    const secret = ')g[nrHd23)N*#uj2#R^6PU';
 
-    context.acquireTokenWithUsernamePassword(resource, authParameters.username, authParameters.password,
-      authParameters.clientId, async function(err, tokenResponse: adal.TokenResponse) {
+    context.acquireTokenWithClientCredentials(resource, authParameters.clientId, secret,
+      function(err, tokenResponse: adal.TokenResponse) {
       if (err) {
         that.logger.error('well that didn\'t work: ' + err.stack);
         $('#userId').removeClass('authenticated').addClass('notAuthenticated');
         $('#userPass').removeClass('authenticated').addClass('notAuthenticated');
+        return;
       } else {
-        that.logger.info(`Successfully authenticated with token:  ${tokenResponse.accessToken}`);
-        let groups: any;
-        const graphUrl = 'https://graph.microsoft.com/v1.0/me/memberOf';
-        fetch(graphUrl, { method: 'GET', headers: { 'Authorization': 'Bearer ' + tokenResponse.accessToken }
-        }).then((response) => {
-            response.json().then((res) => {
-                groups = res.value;
-                for (const grp of groups) {
-                    this.logger.info(`Found group: ${grp.DisplayName}`);
-                }
-            });
-        }).catch((error) => {
-            this.logger.error(error);
-        });
-
-        that.logger.info(`Found ${groups.length()} group memberships for ${authParameters.username}`);
+        that.userAuthenticated = true;
         $('#userId').removeClass('notAuthenticated').addClass('authenticated');
         $('#userPass').removeClass('notAuthenticated').addClass('authenticated');
+        const client = MicrosoftGraph.Client.init({
+          defaultVersion: 'v1.0',
+          authProvider: (done) => {
+              done(null, tokenResponse.accessToken);
+          },
+        });
+        client.api(`/users/${userId}/memberOf`)
+        .get((exception, results: any) => {
+            if (exception) {
+              that.logger.error(exception);
+            } else {
+              const groups: any[] = results.value;
+              that.logger.info(`Returned ${groups.length} total groups from MS Graph!`);
+              for (const grp of groups) {
+                that.logger.info(`Found group: ${grp.displayName}`);
+                that.groupsList += grp.displayName + ';';
+              }
+              $('#numGroups').text(`You are a member of ${groups.length} total groups!`);
+            }
+            that.savePreferences();
+        });
       }
     });
   }

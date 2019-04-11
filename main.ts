@@ -57,7 +57,7 @@ function createMainWindow() {
       nodeIntegration: true,
     },
     icon: __dirname + '/dist/favicon.png',
-    show: true
+    show: false
   });
 
   if (serve) {
@@ -198,7 +198,6 @@ function openPreferences() {
   prefsWin.show();
   prefsWin.focus();
 }
-
 
 // ipcMain listener mainChannel
 ipcMain.on('mainChannel', (event, arg) => {
