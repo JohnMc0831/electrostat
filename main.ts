@@ -73,7 +73,7 @@ function createMainWindow() {
     }));
   }
   // JRM edits here
-  win.setMenuBarVisibility(true);
+  win.setMenuBarVisibility(false);
   win.setResizable(false); // no window resizing for you!
 
   // tray icon and context menu
@@ -185,9 +185,11 @@ function openPreferences() {
       nodeIntegration: true,
     },
     icon: __dirname + '/dist/favicon.png',
-    show: false
+    show: false,
+    resizable: false
   });
 
+  prefsWin.setMenuBarVisibility(false);
   prefsWin.loadURL(url.format({
     pathname: path.join(__dirname, 'dist/index.html'),
     protocol: 'file:',
@@ -195,8 +197,10 @@ function openPreferences() {
     hash: '/preferences'
   }));
 
-  prefsWin.show();
-  prefsWin.focus();
+  prefsWin.once('ready-to-show', () => {
+    prefsWin.show();
+    // prefsWin.focus();
+  });
 }
 
 // ipcMain listener mainChannel
@@ -222,6 +226,7 @@ ipcMain.on('mainChannel', (event, arg) => {
   }
 });
 
+// ipcMain listener prefsChannel
 ipcMain.on('prefsChannel', (event, arg) => {
   switch (arg) {
     case 'readyForAlerts':
@@ -238,6 +243,7 @@ ipcMain.on('prefsChannel', (event, arg) => {
   }
 });
 
+// app events
 try {
 
   // This method will be called when Electron has finished

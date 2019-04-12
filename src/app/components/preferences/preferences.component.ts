@@ -117,6 +117,7 @@ export class PreferencesComponent implements OnInit {
 
   savePreferences() {
     this.logger.info(`Saving electroStat client configuration preferences to settings file: ${this.configFile}`);
+    this.prefs = new Preferences();
     this.prefs.isKiosk = $('#chkIsKiosk').is(':checked');
     this.prefs.numSecondsToDisplay = this.prefs.isKiosk ? $('#numSecondsToShow').val().toString() : '';
     this.prefs.userAuthenticated = this.userAuthenticated;
