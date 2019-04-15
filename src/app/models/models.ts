@@ -14,6 +14,7 @@ export class StatAlert {
   sentBy: string;
   narrative: string;
   Id: number;
+  id: number;
   alertLevel: string;
   alertType: string;
   alertTime: string;
@@ -52,5 +53,5 @@ export class Ack {
   Device: string;
   time: Date;
   Account: string;
-  AcknowledgedAt: Date;
+  AcknowledgedAt: string;
 }

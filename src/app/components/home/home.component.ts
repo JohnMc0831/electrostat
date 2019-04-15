@@ -2,7 +2,7 @@ import { app, BrowserWindow, remote, ipcRenderer, Tray, Menu } from 'electron';
 import { Component, OnInit, NgModuleFactoryLoader } from '@angular/core';
 import * as $ from 'jquery';
 import * as moment from 'moment';
-import { StatAlert } from '../../models/models';
+import { StatAlert, Ack } from '../../models/models';
 import { ConsoleForElectron } from 'winston-console-for-electron';
 import * as winston from 'winston';
 import * as signalR from '@aspnet/signalr';
@@ -12,6 +12,7 @@ import { Howl, Howler } from 'howler';
 import fetch from 'electron-fetch';
 import * as ip from 'ip';
 import { HOST_ATTR } from '@angular/platform-browser/src/dom/dom_renderer';
+import * as os from 'os';
 
 @Component({
   selector: 'app-home',
@@ -24,6 +25,10 @@ export class HomeComponent implements OnInit {
   public showAll: boolean;
   public alert: StatAlert = new StatAlert();
   renderer: any = ipcRenderer;
+  public connection = new signalR.HubConnectionBuilder()
+  .withUrl('https://stat.uvmhealth.org/alertHub')
+  .configureLogging(signalR.LogLevel.Information)
+  .build();
 
   constructor(private electronSvc: ElectronService) {
     const tempPath = remote.app.getPath('temp');
@@ -55,8 +60,6 @@ export class HomeComponent implements OnInit {
     });
   }
 
-
-
   ngOnInit() {
     if (this.electronSvc.isElectronApp) {
       this.logger.info('Awakening ipcRenderer...');
@@ -86,14 +89,8 @@ export class HomeComponent implements OnInit {
   initSignalR() {
     const that = this;
     this.logger.info('Initializing signalR client');
-    const connection = new signalR.HubConnectionBuilder()
-      .withUrl('https://stat.uvmhealth.org/alertHub')
-      .configureLogging(signalR.LogLevel.Information)
-      .build();
 
-    connection
-      .start()
-      .then(function() {
+    this.connection.start().then(function() {
         that.logger.info(
           'signalR sub-system is now connected to cloud-hosted service bus.'
         );
@@ -105,7 +102,7 @@ export class HomeComponent implements OnInit {
       });
 
     // start listening for alerts
-    connection.on('broadcastAlert', alert => {
+    this.connection.on('broadcastAlert', alert => {
       this.alert = alert;
       this.showAll = this.electronSvc.ipcRenderer.sendSync(
         'mainChannel',
@@ -271,9 +268,26 @@ export class HomeComponent implements OnInit {
   }
 
   ackAlert() {
+    let ack = new Ack();
+    ack.Account = process.env.username || process.env.user;
+    ack.AcknowledgedAt = moment().format("MM/DD/YYYY hh:mm:ss a");
+    ack.AlertId = this.alert.id.toString();
+    ack.Device =  os.hostname();
+    ack.time = new Date();
+    this.logger.info('Creating acknowledgement object with the following props:');
+    this.logger.info(`Alert ID: ${ack.AlertId}`);
+    this.logger.info(`Acknowledging Account: ${ack.Account}`);
+    this.logger.info(`Acknowledged at: ${ack.AcknowledgedAt}`);
+    this.logger.info(`From Device: ${ack.Device}`);
+    this.connection.send('AckAlert', ack).catch((exception) => {
+      if (exception) {
+        this.logger.error(`AckAlert SignalR message failed to send: ${exception}`);
+      } else {
+        this.logger.info('AckAlert SignalR message sent!');
+      }
+    });
     const win = remote.getCurrentWindow();
     win.hide();
-    // TODO:  Actually ack the alert via signalR
   }
 
   getLastAlert() {
@@ -285,14 +299,8 @@ export class HomeComponent implements OnInit {
       dataType: 'json',
       type: 'GET'
     }).always(function(alert) {
-      that.logger.info(`Retrieved alert ${alert}.`);
       that.alert = alert;
-      that.logger.info(
-        `Stat alert received at ${moment().format('MM/DD/YYYY hh:mm:ss a')}.`
-      );
-      that.logger.info(
-        `Alert Title: ${that.alert.title} was sent at ${that.alert.alertTime}`
-      );
+      that.logger.info(`Alert ${alert.title} with id ${alert.id} was received at ${moment().format('MM/DD/YYYY hh:mm:ss a')}.`);
       const inScope: boolean = that.amIInScope();
       that.displayAlert();
     });

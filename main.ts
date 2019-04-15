@@ -73,8 +73,8 @@ function createMainWindow() {
     }));
   }
   // JRM edits here
-  win.setMenuBarVisibility(false);
-  win.setResizable(false); // no window resizing for you!
+  win.setMenuBarVisibility(true);
+  win.setResizable(true); // no window resizing for you!
 
   // tray icon and context menu
   const iconPath = path.join(__dirname, './dist/favicon.png');
@@ -199,7 +199,6 @@ function openPreferences() {
 
   prefsWin.once('ready-to-show', () => {
     prefsWin.show();
-    // prefsWin.focus();
   });
 }
 
